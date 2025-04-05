@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Following Feed - Sustagram{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold text-green-700 mb-4">👥 Your Personal Feed</h2>
+
+  <div class="flex items-center justify-between mb-6">
+    <p class="text-sm text-gray-600">Following <strong>{{ request.user.following.count }}</strong> users</p>
+    <a href="{% url 'feed' %}" class="text-sm text-blue-600 hover:underline">See General Feed</a>
+  </div>
+
+  <div class="space-y-6">
+    {% for post in page_obj %}
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <a href="{% url 'profile' post.user.username %}" class="font-semibold text-green-700 hover:underline">
+            {{ post.user.username }}
+          </a>
+          <p class="text-xs text-gray-400">{{ post.created_at|date:"M d, Y H:i" }}</p>
+        </div>
+        <a href="?tag={{ post.tag }}"
+           class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full hover:bg-green-200">
+          {{ post.get_tag_display }}
+        </a>
+      </div>
+
+      {% if post.user != request.user %}
+        <form method="post"
+              action="{% url 'toggle_follow' post.user.username %}"
+              class="mb-3">
+          {% csrf_token %}
+          {% if post.user.id in following_user_ids %}
+            <button type="submit"
+                    class="bg-red-500 text-white text-xs px-3 py-1 rounded hover:bg-red-600">
+              Unfollow
+            </button>
+          {% else %}
+            <button type="submit"
+                    class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700">
+              Follow
+            </button>
+          {% endif %}
+        </form>
+      {% endif %}
+
+
+        {% if post.image %}
+          <img src="{{ post.image.url }}" class="w-full rounded-lg mb-3" alt="Post image">
+        {% endif %}
+
+        {% if post.user == request.user %}
+          <span class="text-xs text-gray-400">Your score: {{ request.user.green_score }}</span>
+        {% endif %}
+
+        {% if post.caption %}
+          <p class="text-gray-700">{{ post.caption }}</p>
+        {% endif %}
+    {% empty %}
+      <p class="text-gray-500">No posts yet from people you follow.</p>
+    {% endfor %}
+    <div class="mt-6 flex justify-center gap-4">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="text-sm text-blue-600 hover:underline">Previous</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="text-sm text-blue-600 hover:underline">Next</a>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
