@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User
+from .models import User, Follow
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -8,3 +8,5 @@ class UserAdmin(BaseUserAdmin):
   fieldsets = BaseUserAdmin.fieldsets + (
     ('Sustagram Info', {'fields': ('is_ngo', 'is_company', 'green_score')}),
   )
+
+admin.site.register(Follow)

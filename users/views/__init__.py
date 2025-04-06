@@ -1,1 +1,1 @@
-from . import auth, home, leaderboard, profile, follow, edit
+from . import auth, home, leaderboard, profile, follow, edit, followers_list, following_list, dashboard

@@ -10,6 +10,19 @@ class User(AbstractUser):
   bio = models.TextField(blank=True, max_length=300)
   last_post_at = models.DateTimeField(null=True, blank=True)
 
+  @property
+  def badge(self):
+    score = self.green_score
+    if score >= 300:
+      return "🦸‍♂️ Eco Legend"
+    elif score >= 150:
+      return "🌳 Sustainability Hero"
+    elif score >= 50:
+      return "🌿 Green Advocate"
+    elif score >= 1:
+      return "🍃 Eco Explorer"
+    return "🐣 Just Starting"
+
   def reset_green_score(self):
     # TODO: implement weekly inactivity check
     pass

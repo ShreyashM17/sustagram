@@ -6,7 +6,7 @@ from django.core.paginator import Paginator
 
 @login_required
 def feed_view(request):
-  posts = Post.objects.select_related('user').order_by('-created_at')
+  posts = Post.objects.select_related('user').prefetch_related('comments__user').order_by('-created_at')
 
   # Get list of usernames the current user follows
   following_user_ids = set(

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Post by {{ post.user.username }}{% endblock %}
+
+{% block content %}
+  <!-- Post Card -->
+  <div class="bg-white rounded-xl shadow p-6 mb-6 space-y-4">
+    <!-- Header -->
+    <div class="flex justify-between items-start">
+      <div>
+        <a href="{% url 'profile' post.user.username %}" class="text-green-700 font-semibold hover:underline text-sm">
+          {{ post.user.username }}
+        </a>
+        <p class="text-xs text-gray-400">{{ post.created_at|date:"M d, Y · H:i" }}</p>
+      </div>
+      <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+        {{ post.get_tag_display }}
+      </span>
+    </div>
+
+    <!-- Image -->
+    {% if post.image %}
+      <img src="{{ post.image.url }}" class="w-full rounded-md" alt="Post image">
+    {% endif %}
+
+    <!-- Caption -->
+    {% if post.caption %}
+      <p class="text-gray-800 text-sm">{{ post.caption }}</p>
+    {% endif %}
+
+    <!-- Delete Button (owner only) -->
+    {% if post.user == user %}
+      <form method="post" action="{% url 'delete_post' post.id %}">
+        {% csrf_token %}
+        <button type="submit"
+                onclick="return confirm('Delete this post?')"
+                class="text-sm text-red-500 hover:underline">
+          Delete Post
+        </button>
+      </form>
+    {% endif %}
+  </div>
+
+  <!-- Comments -->
+  <div class="bg-white rounded-xl shadow p-6 mb-6 space-y-4">
+    <h3 class="text-sm text-gray-700 font-medium">💬 Comments</h3>
+
+    {% for comment in comments %}
+      <div class="border-t pt-3">
+        <p class="text-sm">
+          <a href="{% url 'profile' comment.user.username %}" class="text-green-700 font-semibold hover:underline">
+            {{ comment.user.username }}
+          </a>
+          <span class="text-xs text-gray-400 ml-1">{{ comment.created_at|timesince }} ago</span>
+        </p>
+        <p class="text-sm text-gray-800 mt-1">{{ comment.content }}</p>
+
+        {% if comment.user == user %}
+          <form method="post" action="{% url 'delete_comment' comment.id %}" class="mt-1">
+            {% csrf_token %}
+            <button type="submit"
+                    onclick="return confirm('Delete this comment?')"
+                    class="text-xs text-red-500 hover:underline">
+              Delete
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% empty %}
+      <p class="text-sm text-gray-500 mt-2">No comments yet. Be the first to comment!</p>
+    {% endfor %}
+  </div>
+
+  <!-- Comment Form -->
+  <div class="bg-white rounded-xl shadow p-6">
+    <form method="post" id="comment-form">
+      {% csrf_token %}
+      {{ form }}
+      <button type="submit"
+              class="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm">
+        Post Comment
+      </button>
+    </form>
+  </div>
+
+  <!-- Autofocus JS -->
+  <script>
+    if (window.location.hash === "#comment-form") {
+      const textarea = document.querySelector('#comment-form textarea');
+      if (textarea) textarea.focus();
+    }
+  </script>
+{% endblock %}

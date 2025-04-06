@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Following - {{ profile_user.username }}{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-bold text-green-700 mb-4">
+    👥 {{ profile_user.username }} is following
+  </h2>
+
+  <ul class="space-y-4">
+    {% for user in following_users %}
+      <li class="bg-white p-4 rounded shadow flex flex-col sm:flex-row justify-between sm:items-center">
+        <div>
+          <a href="{% url 'profile' user.username %}" class="font-semibold text-green-700 hover:underline">
+            {{ user.username }}
+          </a>
+          <p class="text-sm text-gray-600">
+            {{ user.badge }}
+          </p>
+        </div>
+        <span class="text-xs text-gray-500 mt-2 sm:mt-0">
+          {% if user.is_ngo %}NGO{% elif user.is_company %}Company{% else %}Individual{% endif %}
+        </span>
+      </li>
+    {% empty %}
+      <p class="text-gray-500 text-sm">No users found.</p>
+    {% endfor %}
+  </ul>
+{% endblock %}

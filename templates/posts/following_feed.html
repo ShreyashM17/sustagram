@@ -11,50 +11,73 @@
 
   <div class="space-y-6">
     {% for post in page_obj %}
-      <div class="flex items-center justify-between mb-2">
+      <div class="bg-white rounded-xl shadow p-4 space-y-4">
+      <!-- Header: User info + timestamp -->
+      <div class="flex justify-between items-start">
         <div>
-          <a href="{% url 'profile' post.user.username %}" class="font-semibold text-green-700 hover:underline">
+          <a href="{% url 'profile' post.user.username %}" class="font-semibold text-green-700 hover:underline text-sm">
             {{ post.user.username }}
           </a>
-          <p class="text-xs text-gray-400">{{ post.created_at|date:"M d, Y H:i" }}</p>
+          <p class="text-xs text-gray-400">{{ post.created_at|date:"M d, Y · H:i" }}</p>
         </div>
-        <a href="?tag={{ post.tag }}"
-           class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full hover:bg-green-200">
+        <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
           {{ post.get_tag_display }}
-        </a>
+        </span>
       </div>
 
-      {% if post.user != request.user %}
-        <form method="post"
-              action="{% url 'toggle_follow' post.user.username %}"
-              class="mb-3">
-          {% csrf_token %}
-          {% if post.user.id in following_user_ids %}
-            <button type="submit"
-                    class="bg-red-500 text-white text-xs px-3 py-1 rounded hover:bg-red-600">
-              Unfollow
-            </button>
-          {% else %}
-            <button type="submit"
-                    class="bg-green-600 text-white text-xs px-3 py-1 rounded hover:bg-green-700">
-              Follow
-            </button>
-          {% endif %}
-        </form>
+      <!-- Image -->
+      {% if post.image %}
+        <img src="{{ post.image.url }}" class="w-full rounded-md" alt="Post image">
       {% endif %}
 
+      <!-- Caption -->
+      {% if post.caption %}
+        <p class="text-gray-800 text-sm">{{ post.caption }}</p>
+      {% endif %}
 
-        {% if post.image %}
-          <img src="{{ post.image.url }}" class="w-full rounded-lg mb-3" alt="Post image">
+      <!-- Comments preview -->
+      {% with post.comments.all|slice:":2" as preview_comments %}
+        {% if preview_comments %}
+          <div class="border-t pt-2 space-y-2">
+            {% for comment in preview_comments %}
+              <p class="text-sm text-gray-700">
+                <span class="font-semibold text-green-700">{{ comment.user.username }}</span>: {{ comment.content }}
+              </p>
+            {% endfor %}
+            <a href="{% url 'post_detail' post.id %}#comment-form" class="text-xs text-blue-600 hover:underline">
+              Add a comment
+            </a>
+          </div>
         {% endif %}
+      {% endwith %}
 
-        {% if post.user == request.user %}
-          <span class="text-xs text-gray-400">Your score: {{ request.user.green_score }}</span>
-        {% endif %}
+      <!-- Actions: Comment / Delete / Follow -->
+      <div class="flex justify-between items-center pt-2 text-sm">
+        <span class="text-gray-600">
+          💬 {{ post.comments.count }} comment{{ post.comments.count|pluralize }}
+        </span>
 
-        {% if post.caption %}
-          <p class="text-gray-700">{{ post.caption }}</p>
-        {% endif %}
+        <div class="flex gap-4">
+          {% if post.user != user %}
+            <form method="post" action="{% url 'toggle_follow' post.user.username %}">
+              {% csrf_token %}
+              {% if post.user.id in following_user_ids %}
+                <button type="submit" class="text-red-500 hover:underline">Unfollow</button>
+              {% else %}
+                <button type="submit" class="text-green-600 hover:underline">Follow</button>
+              {% endif %}
+            </form>
+          {% else %}
+            <form method="post" action="{% url 'delete_post' post.id %}">
+              {% csrf_token %}
+              <button type="submit" onclick="return confirm('Delete this post?')" class="text-red-500 hover:underline">
+                Delete
+              </button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
     {% empty %}
       <p class="text-gray-500">No posts yet from people you follow.</p>
     {% endfor %}
