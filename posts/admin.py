@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post
+from .models import Post, Comment
 from django.utils.html import format_html
 
 @admin.register(Post)
@@ -12,3 +12,8 @@ class PostAdmin(admin.ModelAdmin):
     return "-"
   thumbnail.short_description = "Preview"
 
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+  list_display = ('user', 'post', 'created_at')
+  search_fields = ('content', 'user__username')

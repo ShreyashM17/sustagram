@@ -1,5 +1,5 @@
 from django import forms
-from .models import Post
+from .models import Post, Comment
 
 class PostForm(forms.ModelForm):
   class Meta:
@@ -15,3 +15,15 @@ class PostForm(forms.ModelForm):
           'rounded-md shadow-sm focus:ring-green-500 focus:border-green-500'
         )
       })
+
+class CommentForm(forms.ModelForm):
+  class Meta:
+    model = Comment
+    fields = ['content']
+    widgets = {
+      'content': forms.Textarea(attrs={
+        'rows': 2,
+        'placeholder': 'Leave a comment...',
+        'class': 'w-full px-3 py-2 border rounded-md text-sm focus:ring-green-500 focus:border-green-500'
+      })
+    }

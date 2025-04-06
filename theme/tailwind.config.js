@@ -2,6 +2,7 @@ module.exports = {
   content: [
     // Global template directory
     '../../templates/**/*.html',
+    '../../templates/*.html',
 
     // App-level templates (if any)
     '../../*/templates/**/*.html',

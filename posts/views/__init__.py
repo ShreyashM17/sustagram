@@ -1,1 +1,1 @@
-from . import feed, upload, following, delete
+from . import feed, upload, following, delete, detail, delete_comment
