@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 @login_required
 def personal_feed_view(request):
   followed_users = Follow.objects.filter(user=request.user).values_list('target_id', flat=True)
-  posts = Post.objects.select_related('user').prefetch_related('comments__user').order_by('-created_at')
+  posts = Post.objects.filter(user_id__in=followed_users).select_related('user').order_by('-created_at')
 
   following_user_ids = set(followed_users)
   paginator = Paginator(posts, 5)  # 5 posts per page
